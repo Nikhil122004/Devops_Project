@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/Nikhil122004/Devops_Project.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build('devops_project_image')
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Stop and remove container if it exists
+                    sh 'docker stop devops_project_web || true'
+                    sh 'docker rm devops_project_web || true'
+
+                    // Run new container
+                    sh 'docker run -d -p 3000:80 --name devops_project_web devops_project_image'
+                }
+            }
+        }
+    }
+}
